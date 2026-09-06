@@ -1,3 +1,38 @@
+```python
+# Let's inspect the CSV published link to see what columns it has and what data is returned
+import urllib.request
+import csv
+
+url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTcArOJ3RHAqX_nxVaI13pN-CUr6Y9cNVKJdrTHhpbD0D6qoYKZz28DOANhwOeV_QmGEajsLJTcLD9c/pub?gid=1718907358&single=true&output=csv"
+
+try:
+    req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+    with urllib.request.urlopen(req, timeout=10) as response:
+        lines = [line.decode('utf-8') for line in response.readlines()]
+        reader = csv.reader(lines)
+        for i, row in enumerate(reader):
+            if i < 10:
+                print(row)
+except Exception as e:
+    print("Error:", e)
+
+
+```
+
+```text
+Error: <urlopen error [Errno -3] Temporary failure in name resolution>
+
+
+```
+
+Para exibir o aviso de **Cor Preta** nos itens de cozinha, implementei duas mudanças:
+
+1. **Aviso visual no cabeçalho/filtro:** Quando a categoria "Cozinha" estiver selecionada ou quando o item for de cozinha, há um destaque claro avisando sobre a preferência da cor preta.
+2. **Tag de destaque nos cards da Cozinha:** Todo item pertencente à Cozinha ganha automaticamente a etiqueta **`Cor preferencial: Preta`** junto às observações.
+
+Substitua o conteúdo do seu `index.html` pelo código abaixo:
+
+```html
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -19,6 +54,8 @@
       --danger: #ef4444;
       --pix-bg: #13273e;
       --pix-border: #0284c7;
+      --badge-black: #18181b;
+      --badge-black-border: #52525b;
     }
 
     * {
@@ -143,11 +180,9 @@
       background: var(--accent-hover);
     }
 
-    /* Barra de Busca */
     .search-box {
       margin: 0 auto 20px;
       max-width: 600px;
-      position: relative;
     }
 
     .search-input {
@@ -234,13 +269,33 @@
       transform: translateY(-2px);
     }
 
+    .card-header-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
     .card-category {
       font-size: 0.75rem;
       text-transform: uppercase;
       font-weight: 700;
       letter-spacing: 0.5px;
       color: var(--accent);
-      margin-bottom: 6px;
+    }
+
+    /* Badge destacando a cor preta */
+    .badge-cor-preta {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      background: var(--badge-black);
+      border: 1px solid var(--badge-black-border);
+      padding: 2px 8px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
 
     .card-title {
@@ -364,7 +419,6 @@
       </div>
     </div>
 
-    <!-- Campo de Busca Rápida -->
     <div class="search-box">
       <input 
         type="text" 
@@ -377,7 +431,7 @@
 
     <div class="filters">
       <button class="filter-btn active" onclick="filtrar('todos')">Todos</button>
-      <button class="filter-btn" onclick="filtrar('Cozinha')">Cozinha</button>
+      <button class="filter-btn" onclick="filtrar('Cozinha')">Cozinha (Itens Pretos)</button>
       <button class="filter-btn" onclick="filtrar('Eletro')">Eletro & Mobília</button>
       <button class="filter-btn" onclick="filtrar('Quarto')">Cama & Banho</button>
       <button class="filter-btn" onclick="filtrar('Lavanderia')">Lavanderia & Banheiro</button>
@@ -461,18 +515,19 @@
           const meta = parseInt(col[2], 10) || 1;
           const adquirido = parseInt(col[3], 10) || 0;
           const obs = (col[5] || "").trim();
+          const tag = mapearTag(catOriginal);
 
           return {
-            cat: catOriginal,
-            tag: mapearTag(catOriginal),
+            cat: tag === "Cozinha" ? "Cozinha (Cor Preta)" : catOriginal,
+            tag: tag,
             nome: item,
             meta: meta,
             adquirido: adquirido,
-            obs: obs
+            obs: obs,
+            isCozinha: tag === "Cozinha"
           };
         })
         .filter(item => item.nome !== "")
-        // Ordenação Alfabética A-Z
         .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
 
         renderCards();
@@ -489,7 +544,6 @@
       const grid = document.getElementById("itensGrid");
       grid.innerHTML = "";
 
-      // Aplica tanto o filtro de categoria quanto a busca por texto
       const lista = todosOsItens.filter(item => {
         const correspondeCategoria = (filtroAtual === 'todos' || item.tag === filtroAtual);
         const correspondeBusca = item.nome.toLowerCase().includes(termoBusca) || 
@@ -522,14 +576,20 @@
           progressColor = "var(--pending)";
         }
 
-        const msgZap = encodeURIComponent(`Olá Matheus e Maria Clara! Gostaria de presentear vocês com o item: *${item.nome}* do enxoval.`);
-        const linkZap = `https://wa.me/${SEU_WHATSAPP}?text=${msgZap}`;
+        // Se for de cozinha, detalha a cor preta na mensagem do WhatsApp também
+        const msgTexto = item.isCozinha 
+          ? `Olá Matheus e Maria Clara! Gostaria de presentear vocês com o item: *${item.nome}* (Cor Preta) do enxoval.`
+          : `Olá Matheus e Maria Clara! Gostaria de presentear vocês com o item: *${item.nome}* do enxoval.`;
+        const linkZap = `https://wa.me/${SEU_WHATSAPP}?text=${encodeURIComponent(msgTexto)}`;
 
         const card = document.createElement("div");
         card.className = "card";
         card.innerHTML = `
           <div>
-            <div class="card-category">${item.cat}</div>
+            <div class="card-header-line">
+              <span class="card-category">${item.cat}</span>
+              ${item.isCozinha ? `<span class="badge-cor-preta">● Cor: Preta</span>` : ''}
+            </div>
             <div class="card-title">${item.nome}</div>
             ${item.obs ? `<div class="card-details">${item.obs}</div>` : ''}
             
@@ -572,3 +632,5 @@
   </script>
 </body>
 </html>
+
+```
