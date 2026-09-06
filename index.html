@@ -17,6 +17,8 @@
       --success: #22c55e;
       --pending: #f59e0b;
       --danger: #ef4444;
+      --pix-bg: #13273e;
+      --pix-border: #0284c7;
     }
 
     * {
@@ -29,7 +31,7 @@
     body {
       background-color: var(--bg);
       color: var(--text-main);
-      padding: 24px 16px 80px;
+      padding: 28px 16px 80px;
       min-height: 100vh;
     }
 
@@ -40,7 +42,7 @@
 
     header {
       text-align: center;
-      margin-bottom: 32px;
+      margin-bottom: 24px;
     }
 
     .badge-top {
@@ -65,8 +67,86 @@
     header p {
       color: var(--text-sub);
       font-size: 0.95rem;
-      max-width: 540px;
+      max-width: 580px;
       margin: 0 auto;
+    }
+
+    /* Frase de agradecimento */
+    .fraterno-box {
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px dashed #475569;
+      border-radius: 14px;
+      padding: 16px 20px;
+      text-align: center;
+      margin: 20px auto 28px;
+      max-width: 720px;
+      color: #e2e8f0;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .fraterno-box strong {
+      color: var(--accent);
+    }
+
+    /* Bloco do PIX */
+    .pix-card {
+      background: var(--pix-bg);
+      border: 1px solid var(--pix-border);
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+      max-width: 580px;
+      margin: 0 auto 36px;
+      box-shadow: 0 4px 20px rgba(2, 132, 199, 0.15);
+    }
+
+    .pix-card h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #38bdf8;
+    }
+
+    .pix-card p {
+      font-size: 0.85rem;
+      color: #bae6fd;
+      margin-bottom: 14px;
+    }
+
+    .pix-input-group {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      background: #0b1526;
+      border: 1px solid #1e3a5f;
+      border-radius: 10px;
+      padding: 6px 10px;
+      align-items: center;
+    }
+
+    .pix-key {
+      font-family: monospace;
+      font-size: 0.95rem;
+      color: #f0f9ff;
+      word-break: break-all;
+    }
+
+    .btn-copy-pix {
+      background: var(--accent);
+      color: #0f172a;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+
+    .btn-copy-pix:hover {
+      background: var(--accent-hover);
     }
 
     .filters {
@@ -198,6 +278,12 @@
       color: var(--danger);
     }
 
+    .card-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
     .action-btn {
       display: block;
       width: 100%;
@@ -236,6 +322,21 @@
       <p>Acompanhe em tempo real o que já temos e o que ainda falta para o nosso cantinho!</p>
     </header>
 
+    <!-- Frase de Agradecimento aos Irmãos -->
+    <div class="fraterno-box">
+      <em>"Agradecemos de coração a cada irmão, amigo e familiar que está nos apoiando nesta nova etapa. Que Deus recompense imensamente o carinho, a presença e a generosidade de vocês ao nos ajudarem a erguer o nosso lar!"</em>
+    </div>
+
+    <!-- Bloco Chave PIX -->
+    <div class="pix-card">
+      <h3>Prefere contribuir com qualquer valor em dinheiro?</h3>
+      <p>Você pode fazer um PIX direto para nos ajudar a comprar os itens pendentes:</p>
+      <div class="pix-input-group">
+        <span class="pix-key" id="chavePixTexto">matheusgomes2225@hotmail.com</span>
+        <button class="btn-copy-pix" onclick="copiarPix(this)">Copiar Chave</button>
+      </div>
+    </div>
+
     <!-- Filtros por Cômodo -->
     <div class="filters">
       <button class="filter-btn active" onclick="filtrar('todos')">Todos</button>
@@ -251,8 +352,9 @@
   </div>
 
   <script>
-    // Altere para o seu número com DDI e DDD (ex: 5575999999999)
+    // Substitua pelo seu número com DDD (ex: 5575999999999)
     const SEU_WHATSAPP = "5575988660943";
+    const CHAVE_PIX = "matheusgomes2225@hotmail.com";
 
     const dados = [
       // Cozinha
@@ -310,6 +412,18 @@
       { cat: "Sala & Extras", tag: "Sala", nome: "Tapetes", meta: 3, adquirido: 0, obs: "" }
     ];
 
+    function copiarPix(btn) {
+      navigator.clipboard.writeText(CHAVE_PIX).then(() => {
+        const originalText = btn.innerText;
+        btn.innerText = "Copiado!";
+        btn.style.background = "var(--success)";
+        setTimeout(() => {
+          btn.innerText = originalText;
+          btn.style.background = "";
+        }, 2000);
+      });
+    }
+
     function renderCards(lista) {
       const grid = document.getElementById("itensGrid");
       grid.innerHTML = "";
@@ -355,10 +469,10 @@
             </div>
           </div>
 
-          <div>
+          <div class="card-actions">
             ${completo 
               ? `<span class="action-btn btn-completed">Item Já Garantido</span>`
-              : `<a href="${linkZap}" target="_blank" class="action-btn btn-available">Quero Presentear</a>`
+              : `<a href="${linkZap}" target="_blank" class="action-btn btn-available">Presentear via WhatsApp</a>`
             }
           </div>
         `;
@@ -367,7 +481,6 @@
     }
 
     function filtrar(filtro) {
-      // Alterna classes ativas dos botões
       document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.classList.toggle('active', btn.getAttribute('onclick').includes(`'${filtro}'`));
       });
@@ -379,7 +492,6 @@
       }
     }
 
-    // Inicializa a página
     renderCards(dados);
   </script>
 </body>
