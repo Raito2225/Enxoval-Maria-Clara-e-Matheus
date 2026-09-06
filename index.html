@@ -71,7 +71,6 @@
       margin: 0 auto;
     }
 
-    /* Frase de agradecimento */
     .fraterno-box {
       background: rgba(30, 41, 59, 0.7);
       border: 1px dashed #475569;
@@ -85,11 +84,6 @@
       line-height: 1.5;
     }
 
-    .fraterno-box strong {
-      color: var(--accent);
-    }
-
-    /* Bloco do PIX */
     .pix-card {
       background: var(--pix-bg);
       border: 1px solid var(--pix-border);
@@ -180,6 +174,13 @@
       color: #0f172a;
       border-color: var(--accent);
       font-weight: 600;
+    }
+
+    .loading-state {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-sub);
+      font-size: 1rem;
     }
 
     .grid {
@@ -322,22 +323,19 @@
       <p>Acompanhe em tempo real o que já temos e o que ainda falta para o nosso cantinho!</p>
     </header>
 
-    <!-- Frase de Agradecimento aos Irmãos -->
     <div class="fraterno-box">
       <em>"Agradecemos de coração a cada irmão, amigo e familiar que está nos apoiando nesta nova etapa. Que Deus recompense imensamente o carinho, a presença e a generosidade de vocês ao nos ajudarem a erguer o nosso lar!"</em>
     </div>
 
-    <!-- Bloco Chave PIX -->
     <div class="pix-card">
       <h3>Prefere contribuir com qualquer valor em dinheiro?</h3>
-      <p>Você pode fazer um PIX direto para nos ajudar a comprar os itens pendentes:</p>
+      <p>Você pode fazer um PIX direto para nos ajudar com as despesas da casa:</p>
       <div class="pix-input-group">
-        <span class="pix-key" id="chavePixTexto">matheusgomes2225@hotmail.com</span>
+        <span class="pix-key">matheusgomes2225@hotmail.com</span>
         <button class="btn-copy-pix" onclick="copiarPix(this)">Copiar Chave</button>
       </div>
     </div>
 
-    <!-- Filtros por Cômodo -->
     <div class="filters">
       <button class="filter-btn active" onclick="filtrar('todos')">Todos</button>
       <button class="filter-btn" onclick="filtrar('Cozinha')">Cozinha</button>
@@ -347,70 +345,21 @@
       <button class="filter-btn" onclick="filtrar('Sala')">Sala & Extras</button>
     </div>
 
-    <!-- Grid de Itens -->
-    <div class="grid" id="itensGrid"></div>
+    <div id="itensGrid" class="grid">
+      <div class="loading-state">Carregando itens da lista...</div>
+    </div>
   </div>
 
   <script>
-    // Substitua pelo seu número com DDD (ex: 5575999999999)
-    const SEU_WHATSAPP = "5575988660943";
+    // 1. Cole aqui o link CSV publicado do Google Sheets
+    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTcArOJ3RHAqX_nxVaI13pN-CUr6Y9cNVKJdrTHhpbD0D6qoYKZz28DOANhwOeV_QmGEajsLJTcLD9c/pub?gid=1718907358&single=true&output=csv";
+
+    // 2. Seu número com DDD para abrir o WhatsApp
+    const SEU_WHATSAPP = "75988660943";
     const CHAVE_PIX = "matheusgomes2225@hotmail.com";
 
-    const dados = [
-      // Cozinha
-      { cat: "Cozinha", tag: "Cozinha", nome: "Jogo de panelas e Frigideiras (inclui Wok)", meta: 1, adquirido: 1, obs: "Já temos: Jogo de panelas" },
-      { cat: "Cozinha", tag: "Cozinha", nome: "Panela de pressão", meta: 1, adquirido: 0, obs: "Cor padrão: Preta" },
-      { cat: "Cozinha", tag: "Cozinha", nome: "Assadeiras (vidro, inox e formas de bolo)", meta: 1, adquirido: 0, obs: "Cor padrão: Preta" },
-      { cat: "Cozinha", tag: "Cozinha", nome: "Aparelho de jantar (pratos rasos, fundos e sobremesa)", meta: 1, adquirido: 1, obs: "" },
-      { cat: "Cozinha", tag: "Cozinha", nome: "Faqueiro completo / Jogo de talheres", meta: 2, adquirido: 1, obs: "Já temos: talheres" },
-      { cat: "Cozinha", tag: "Cozinha", nome: "Jogo de copos, taças e xícaras", meta: 1, adquirido: 0, obs: "" },
-      { cat: "Cozinha", tag: "Cozinha", nome: "Jarras, garrafa térmica e chaleira", meta: 1, adquirido: 0, obs: "" },
-      { cat: "Cozinha", tag: "Cozinha", nome: "Facas de corte, amolador e tábuas", meta: 3, adquirido: 1, obs: "Já temos: tábua" },
-      { cat: "Cozinha", tag: "Cozinha", nome: "Colheres de pau, espátulas e conchas", meta: 1, adquirido: 0, obs: "" },
-      { cat: "Cozinha", tag: "Cozinha", nome: "Escorredor de louça", meta: 1, adquirido: 0, obs: "" },
-      { cat: "Cozinha", tag: "Cozinha", nome: "Escorredor de massa", meta: 1, adquirido: 0, obs: "" },
-      { cat: "Cozinha", tag: "Cozinha", nome: "Ralador, peneiras, abridores e saca-rolhas", meta: 1, adquirido: 0, obs: "" },
-      { cat: "Cozinha", tag: "Cozinha", nome: "Potes para mantimentos e temperos", meta: 1, adquirido: 1, obs: "Já temos: Plástico" },
-      { cat: "Cozinha", tag: "Cozinha", nome: "Panos de prato e panos de pia", meta: 1, adquirido: 0, obs: "" },
-
-      // Eletrodomésticos e Mobília
-      { cat: "Eletro & Mobília", tag: "Eletro", nome: "Geladeira / Refrigerador", meta: 1, adquirido: 1, obs: "Já temos" },
-      { cat: "Eletro & Mobília", tag: "Eletro", nome: "Fogão ou Cooktop (com forno)", meta: 1, adquirido: 1, obs: "Já temos" },
-      { cat: "Eletro & Mobília", tag: "Eletro", nome: "Micro-ondas", meta: 1, adquirido: 0, obs: "" },
-      { cat: "Eletro & Mobília", tag: "Eletro", nome: "Máquina de lavar roupa", meta: 1, adquirido: 0, obs: "" },
-      { cat: "Eletro & Mobília", tag: "Eletro", nome: "Liquidificador, Batedeira e Mixer", meta: 3, adquirido: 2, obs: "Já temos: Liquidificador e mixer" },
-      { cat: "Eletro & Mobília", tag: "Eletro", nome: "Air fryer e Panela elétrica de arroz", meta: 2, adquirido: 2, obs: "Meta batida!" },
-      { cat: "Eletro & Mobília", tag: "Eletro", nome: "Cafeteira, Sanduicheira", meta: 2, adquirido: 1, obs: "Já temos: Sanduicheira" },
-      { cat: "Eletro & Mobília", tag: "Eletro", nome: "Filtro / Purificador de água", meta: 1, adquirido: 0, obs: "" },
-      { cat: "Eletro & Mobília", tag: "Eletro", nome: "Aspirador de pó e Ferro de passar", meta: 2, adquirido: 2, obs: "Meta batida!" },
-      { cat: "Eletro & Mobília", tag: "Eletro", nome: "Sofá, Painel/Rack para TV e TV", meta: 3, adquirido: 2, obs: "Já temos: Sofá e TV" },
-      { cat: "Eletro & Mobília", tag: "Eletro", nome: "Mesa de jantar com cadeiras", meta: 1, adquirido: 0, obs: "" },
-      { cat: "Eletro & Mobília", tag: "Eletro", nome: "Cama (Box/Colchão), Cabeceira e Criados", meta: 1, adquirido: 0, obs: "" },
-      { cat: "Eletro & Mobília", tag: "Eletro", nome: "Closet (organizadores) e Cômoda", meta: 1, adquirido: 0, obs: "" },
-
-      // Cama, Banho e Quarto
-      { cat: "Cama, Banho e Quarto", tag: "Quarto", nome: "Jogos de lençol e Fronhas", meta: 1, adquirido: 0, obs: "Lençol com elástico" },
-      { cat: "Cama, Banho e Quarto", tag: "Quarto", nome: "Edredons, Cobertores e Mantas", meta: 1, adquirido: 0, obs: "" },
-      { cat: "Cama, Banho e Quarto", tag: "Quarto", nome: "Toalhas de banho e Toalhas de rosto", meta: 6, adquirido: 2, obs: "" },
-      { cat: "Cama, Banho e Quarto", tag: "Quarto", nome: "Jogos americanos, toalhas de mesa", meta: 1, adquirido: 0, obs: "" },
-      { cat: "Cama, Banho e Quarto", tag: "Quarto", nome: "Cabides e Organizadores", meta: 1, adquirido: 0, obs: "" },
-
-      // Lavanderia e Banheiro
-      { cat: "Lavanderia e Banheiro", tag: "Lavanderia", nome: "Kit acessórios (saboneteira, porta papel)", meta: 1, adquirido: 0, obs: "" },
-      { cat: "Lavanderia e Banheiro", tag: "Lavanderia", nome: "Cesto de roupa, lixeira e escova", meta: 3, adquirido: 1, obs: "Já temos: Cesto de roupa suja" },
-      { cat: "Lavanderia e Banheiro", tag: "Lavanderia", nome: "Espelho e Kit Primeiros Socorros", meta: 2, adquirido: 0, obs: "" },
-      { cat: "Lavanderia e Banheiro", tag: "Lavanderia", nome: "Vassouras, rodo, pá de lixo e esfregão", meta: 1, adquirido: 0, obs: "" },
-      { cat: "Lavanderia e Banheiro", tag: "Lavanderia", nome: "Baldes, bacias e tábua de passar roupa", meta: 1, adquirido: 0, obs: "" },
-      { cat: "Lavanderia e Banheiro", tag: "Lavanderia", nome: "Vaso sanitário (com caixa acoplada)", meta: 1, adquirido: 0, obs: "" },
-      { cat: "Lavanderia e Banheiro", tag: "Lavanderia", nome: "Chuveiro elétrico", meta: 1, adquirido: 0, obs: "" },
-      { cat: "Lavanderia e Banheiro", tag: "Lavanderia", nome: "Pia (cuba)", meta: 1, adquirido: 0, obs: "" },
-
-      // Sala, Decoração e Extras
-      { cat: "Sala & Extras", tag: "Sala", nome: "Cortinas", meta: 2, adquirido: 0, obs: "" },
-      { cat: "Sala & Extras", tag: "Sala", nome: "Almofadas decorativas e manta para sofá", meta: 1, adquirido: 0, obs: "" },
-      { cat: "Sala & Extras", tag: "Sala", nome: "Luminárias, abajures, quadros e plantas", meta: 1, adquirido: 0, obs: "" },
-      { cat: "Sala & Extras", tag: "Sala", nome: "Tapetes", meta: 3, adquirido: 0, obs: "" }
-    ];
+    let todosOsItens = [];
+    let filtroAtual = 'todos';
 
     function copiarPix(btn) {
       navigator.clipboard.writeText(CHAVE_PIX).then(() => {
@@ -424,9 +373,92 @@
       });
     }
 
-    function renderCards(lista) {
+    // Parser manual de CSV para suportar campos entre aspas
+    function parseCSV(text) {
+      const p = [];
+      let row = [''];
+      let inQuotes = false;
+
+      for (let i = 0; i < text.length; i++) {
+        const c = text[i];
+        const next = text[i + 1];
+
+        if (c === '"') {
+          if (inQuotes && next === '"') {
+            row[row.length - 1] += '"';
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (c === ',' && !inQuotes) {
+          row.push('');
+        } else if ((c === '\r' || c === '\n') && !inQuotes) {
+          if (c === '\r' && next === '\n') i++;
+          p.push(row);
+          row = [''];
+        } else {
+          row[row.length - 1] += c;
+        }
+      }
+      if (row.length > 1 || row[0] !== '') p.push(row);
+      return p;
+    }
+
+    function mapearTag(categoria) {
+      const cat = (categoria || "").toLowerCase();
+      if (cat.includes("cozinha")) return "Cozinha";
+      if (cat.includes("eletro") || cat.includes("mobília")) return "Eletro";
+      if (cat.includes("cama") || cat.includes("quarto")) return "Quarto";
+      if (cat.includes("lavanderia") || cat.includes("banheiro")) return "Lavanderia";
+      return "Sala";
+    }
+
+    async function carregarDadosPlanilha() {
+      try {
+        const res = await fetch(CSV_URL);
+        const csvText = await res.text();
+        const linhas = parseCSV(csvText);
+
+        // Ignora o cabeçalho (linha 0)
+        todosOsItens = linhas.slice(1).map(col => {
+          const catOriginal = (col[0] || "").trim();
+          const item = (col[1] || "").trim();
+          const meta = parseInt(col[2], 10) || 1;
+          const adquirido = parseInt(col[3], 10) || 0;
+          const obs = (col[5] || "").trim();
+
+          return {
+            cat: catOriginal,
+            tag: mapearTag(catOriginal),
+            nome: item,
+            meta: meta,
+            adquirido: adquirido,
+            obs: obs
+          };
+        }).filter(item => item.nome !== "");
+
+        renderCards();
+      } catch (err) {
+        document.getElementById("itensGrid").innerHTML = `
+          <div class="loading-state" style="color: var(--danger)">
+            Erro ao carregar a planilha. Verifique se o link CSV está publicado corretamente.
+          </div>
+        `;
+      }
+    }
+
+    function renderCards() {
       const grid = document.getElementById("itensGrid");
       grid.innerHTML = "";
+
+      const lista = filtroAtual === 'todos' 
+        ? todosOsItens 
+        : todosOsItens.filter(i => i.tag === filtroAtual);
+
+      if (lista.length === 0) {
+        grid.innerHTML = `<div class="loading-state">Nenhum item encontrado nesta categoria.</div>`;
+        return;
+      }
 
       lista.forEach(item => {
         const pct = Math.min(100, Math.round((item.adquirido / item.meta) * 100));
@@ -481,18 +513,14 @@
     }
 
     function filtrar(filtro) {
+      filtroAtual = filtro;
       document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.classList.toggle('active', btn.getAttribute('onclick').includes(`'${filtro}'`));
       });
-
-      if (filtro === 'todos') {
-        renderCards(dados);
-      } else {
-        renderCards(dados.filter(item => item.tag === filtro));
-      }
+      renderCards();
     }
 
-    renderCards(dados);
+    carregarDadosPlanilha();
   </script>
 </body>
 </html>
