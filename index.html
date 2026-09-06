@@ -143,6 +143,34 @@
       background: var(--accent-hover);
     }
 
+    /* Barra de Busca */
+    .search-box {
+      margin: 0 auto 20px;
+      max-width: 600px;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      background: #1e293b;
+      border: 1px solid var(--card-border);
+      padding: 12px 18px;
+      border-radius: 12px;
+      color: var(--text-main);
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+    }
+
+    .search-input::placeholder {
+      color: #64748b;
+    }
+
     .filters {
       display: flex;
       gap: 8px;
@@ -336,6 +364,17 @@
       </div>
     </div>
 
+    <!-- Campo de Busca Rápida -->
+    <div class="search-box">
+      <input 
+        type="text" 
+        id="buscaInput" 
+        class="search-input" 
+        placeholder="🔍 Pesquisar produto no enxoval..." 
+        oninput="pesquisarItens(this.value)"
+      >
+    </div>
+
     <div class="filters">
       <button class="filter-btn active" onclick="filtrar('todos')">Todos</button>
       <button class="filter-btn" onclick="filtrar('Cozinha')">Cozinha</button>
@@ -351,15 +390,13 @@
   </div>
 
   <script>
-    // 1. Cole aqui o link CSV publicado do Google Sheets
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTcArOJ3RHAqX_nxVaI13pN-CUr6Y9cNVKJdrTHhpbD0D6qoYKZz28DOANhwOeV_QmGEajsLJTcLD9c/pub?gid=1718907358&single=true&output=csv";
-
-    // 2. Seu número com DDD para abrir o WhatsApp
     const SEU_WHATSAPP = "75988660943";
     const CHAVE_PIX = "matheusgomes2225@hotmail.com";
 
     let todosOsItens = [];
     let filtroAtual = 'todos';
+    let termoBusca = '';
 
     function copiarPix(btn) {
       navigator.clipboard.writeText(CHAVE_PIX).then(() => {
@@ -373,7 +410,6 @@
       });
     }
 
-    // Parser manual de CSV para suportar campos entre aspas
     function parseCSV(text) {
       const p = [];
       let row = [''];
@@ -419,7 +455,6 @@
         const csvText = await res.text();
         const linhas = parseCSV(csvText);
 
-        // Ignora o cabeçalho (linha 0)
         todosOsItens = linhas.slice(1).map(col => {
           const catOriginal = (col[0] || "").trim();
           const item = (col[1] || "").trim();
@@ -435,7 +470,10 @@
             adquirido: adquirido,
             obs: obs
           };
-        }).filter(item => item.nome !== "");
+        })
+        .filter(item => item.nome !== "")
+        // Ordenação Alfabética A-Z
+        .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
 
         renderCards();
       } catch (err) {
@@ -451,12 +489,17 @@
       const grid = document.getElementById("itensGrid");
       grid.innerHTML = "";
 
-      const lista = filtroAtual === 'todos' 
-        ? todosOsItens 
-        : todosOsItens.filter(i => i.tag === filtroAtual);
+      // Aplica tanto o filtro de categoria quanto a busca por texto
+      const lista = todosOsItens.filter(item => {
+        const correspondeCategoria = (filtroAtual === 'todos' || item.tag === filtroAtual);
+        const correspondeBusca = item.nome.toLowerCase().includes(termoBusca) || 
+                                 item.cat.toLowerCase().includes(termoBusca) || 
+                                 item.obs.toLowerCase().includes(termoBusca);
+        return correspondeCategoria && correspondeBusca;
+      });
 
       if (lista.length === 0) {
-        grid.innerHTML = `<div class="loading-state">Nenhum item encontrado nesta categoria.</div>`;
+        grid.innerHTML = `<div class="loading-state">Nenhum item encontrado com esse termo ou filtro.</div>`;
         return;
       }
 
@@ -510,6 +553,11 @@
         `;
         grid.appendChild(card);
       });
+    }
+
+    function pesquisarItens(valor) {
+      termoBusca = valor.trim().toLowerCase();
+      renderCards();
     }
 
     function filtrar(filtro) {
