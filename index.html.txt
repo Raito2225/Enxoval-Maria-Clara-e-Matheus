@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enxoval da Nossa Casa | Matheus & Maria Clara</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --card-border: #334155;
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --accent: #38bdf8;
+      --accent-hover: #0ea5e9;
+      --success: #22c55e;
+      --pending: #f59e0b;
+      --danger: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      padding: 24px 16px 80px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1080px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .badge-top {
+      display: inline-block;
+      padding: 6px 14px;
+      background: rgba(56, 189, 248, 0.1);
+      color: var(--accent);
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+      border: 1px solid rgba(56, 189, 248, 0.2);
+    }
+
+    h1 {
+      font-size: 2.1rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+
+    header p {
+      color: var(--text-sub);
+      font-size: 0.95rem;
+      max-width: 540px;
+      margin: 0 auto;
+    }
+
+    .filters {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 12px;
+      margin-bottom: 28px;
+      scrollbar-width: none;
+    }
+
+    .filters::-webkit-scrollbar {
+      display: none;
+    }
+
+    .filter-btn {
+      background: #1e293b;
+      color: var(--text-sub);
+      border: 1px solid var(--card-border);
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .filter-btn.active, .filter-btn:hover {
+      background: var(--accent);
+      color: #0f172a;
+      border-color: var(--accent);
+      font-weight: 600;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .card:hover {
+      border-color: #475569;
+      transform: translateY(-2px);
+    }
+
+    .card-category {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      line-height: 1.35;
+      margin-bottom: 12px;
+    }
+
+    .card-details {
+      font-size: 0.8rem;
+      color: var(--text-sub);
+      background: #0f172a;
+      padding: 8px 12px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+
+    .progress-container {
+      margin-bottom: 16px;
+    }
+
+    .progress-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+
+    .progress-bar {
+      height: 7px;
+      background: #334155;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.4s ease;
+    }
+
+    .status-badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+
+    .status-done {
+      background: rgba(34, 197, 94, 0.15);
+      color: var(--success);
+    }
+
+    .status-partial {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--pending);
+    }
+
+    .status-missing {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--danger);
+    }
+
+    .action-btn {
+      display: block;
+      width: 100%;
+      text-align: center;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 10px 14px;
+      border-radius: 10px;
+      transition: all 0.2s;
+    }
+
+    .btn-available {
+      background: var(--accent);
+      color: #0f172a;
+    }
+
+    .btn-available:hover {
+      background: var(--accent-hover);
+    }
+
+    .btn-completed {
+      background: #334155;
+      color: #64748b;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <div class="badge-top">Nova Casa</div>
+      <h1>Enxoval de Matheus & Maria Clara</h1>
+      <p>Acompanhe em tempo real o que já temos e o que ainda falta para o nosso cantinho!</p>
+    </header>
+
+    <!-- Filtros por Cômodo -->
+    <div class="filters">
+      <button class="filter-btn active" onclick="filtrar('todos')">Todos</button>
+      <button class="filter-btn" onclick="filtrar('Cozinha')">Cozinha</button>
+      <button class="filter-btn" onclick="filtrar('Eletro')">Eletro & Mobília</button>
+      <button class="filter-btn" onclick="filtrar('Quarto')">Cama & Banho</button>
+      <button class="filter-btn" onclick="filtrar('Lavanderia')">Lavanderia & Banheiro</button>
+      <button class="filter-btn" onclick="filtrar('Sala')">Sala & Extras</button>
+    </div>
+
+    <!-- Grid de Itens -->
+    <div class="grid" id="itensGrid"></div>
+  </div>
+
+  <script>
+    // Altere para o seu número com DDI e DDD (ex: 5575999999999)
+    const SEU_WHATSAPP = "5575988660943";
+
+    const dados = [
+      // Cozinha
+      { cat: "Cozinha", tag: "Cozinha", nome: "Jogo de panelas e Frigideiras (inclui Wok)", meta: 1, adquirido: 1, obs: "Já temos: Jogo de panelas" },
+      { cat: "Cozinha", tag: "Cozinha", nome: "Panela de pressão", meta: 1, adquirido: 0, obs: "Cor padrão: Preta" },
+      { cat: "Cozinha", tag: "Cozinha", nome: "Assadeiras (vidro, inox e formas de bolo)", meta: 1, adquirido: 0, obs: "Cor padrão: Preta" },
+      { cat: "Cozinha", tag: "Cozinha", nome: "Aparelho de jantar (pratos rasos, fundos e sobremesa)", meta: 1, adquirido: 1, obs: "" },
+      { cat: "Cozinha", tag: "Cozinha", nome: "Faqueiro completo / Jogo de talheres", meta: 2, adquirido: 1, obs: "Já temos: talheres" },
+      { cat: "Cozinha", tag: "Cozinha", nome: "Jogo de copos, taças e xícaras", meta: 1, adquirido: 0, obs: "" },
+      { cat: "Cozinha", tag: "Cozinha", nome: "Jarras, garrafa térmica e chaleira", meta: 1, adquirido: 0, obs: "" },
+      { cat: "Cozinha", tag: "Cozinha", nome: "Facas de corte, amolador e tábuas", meta: 3, adquirido: 1, obs: "Já temos: tábua" },
+      { cat: "Cozinha", tag: "Cozinha", nome: "Colheres de pau, espátulas e conchas", meta: 1, adquirido: 0, obs: "" },
+      { cat: "Cozinha", tag: "Cozinha", nome: "Escorredor de louça", meta: 1, adquirido: 0, obs: "" },
+      { cat: "Cozinha", tag: "Cozinha", nome: "Escorredor de massa", meta: 1, adquirido: 0, obs: "" },
+      { cat: "Cozinha", tag: "Cozinha", nome: "Ralador, peneiras, abridores e saca-rolhas", meta: 1, adquirido: 0, obs: "" },
+      { cat: "Cozinha", tag: "Cozinha", nome: "Potes para mantimentos e temperos", meta: 1, adquirido: 1, obs: "Já temos: Plástico" },
+      { cat: "Cozinha", tag: "Cozinha", nome: "Panos de prato e panos de pia", meta: 1, adquirido: 0, obs: "" },
+
+      // Eletrodomésticos e Mobília
+      { cat: "Eletro & Mobília", tag: "Eletro", nome: "Geladeira / Refrigerador", meta: 1, adquirido: 1, obs: "Já temos" },
+      { cat: "Eletro & Mobília", tag: "Eletro", nome: "Fogão ou Cooktop (com forno)", meta: 1, adquirido: 1, obs: "Já temos" },
+      { cat: "Eletro & Mobília", tag: "Eletro", nome: "Micro-ondas", meta: 1, adquirido: 0, obs: "" },
+      { cat: "Eletro & Mobília", tag: "Eletro", nome: "Máquina de lavar roupa", meta: 1, adquirido: 0, obs: "" },
+      { cat: "Eletro & Mobília", tag: "Eletro", nome: "Liquidificador, Batedeira e Mixer", meta: 3, adquirido: 2, obs: "Já temos: Liquidificador e mixer" },
+      { cat: "Eletro & Mobília", tag: "Eletro", nome: "Air fryer e Panela elétrica de arroz", meta: 2, adquirido: 2, obs: "Meta batida!" },
+      { cat: "Eletro & Mobília", tag: "Eletro", nome: "Cafeteira, Sanduicheira", meta: 2, adquirido: 1, obs: "Já temos: Sanduicheira" },
+      { cat: "Eletro & Mobília", tag: "Eletro", nome: "Filtro / Purificador de água", meta: 1, adquirido: 0, obs: "" },
+      { cat: "Eletro & Mobília", tag: "Eletro", nome: "Aspirador de pó e Ferro de passar", meta: 2, adquirido: 2, obs: "Meta batida!" },
+      { cat: "Eletro & Mobília", tag: "Eletro", nome: "Sofá, Painel/Rack para TV e TV", meta: 3, adquirido: 2, obs: "Já temos: Sofá e TV" },
+      { cat: "Eletro & Mobília", tag: "Eletro", nome: "Mesa de jantar com cadeiras", meta: 1, adquirido: 0, obs: "" },
+      { cat: "Eletro & Mobília", tag: "Eletro", nome: "Cama (Box/Colchão), Cabeceira e Criados", meta: 1, adquirido: 0, obs: "" },
+      { cat: "Eletro & Mobília", tag: "Eletro", nome: "Closet (organizadores) e Cômoda", meta: 1, adquirido: 0, obs: "" },
+
+      // Cama, Banho e Quarto
+      { cat: "Cama, Banho e Quarto", tag: "Quarto", nome: "Jogos de lençol e Fronhas", meta: 1, adquirido: 0, obs: "Lençol com elástico" },
+      { cat: "Cama, Banho e Quarto", tag: "Quarto", nome: "Edredons, Cobertores e Mantas", meta: 1, adquirido: 0, obs: "" },
+      { cat: "Cama, Banho e Quarto", tag: "Quarto", nome: "Toalhas de banho e Toalhas de rosto", meta: 6, adquirido: 2, obs: "" },
+      { cat: "Cama, Banho e Quarto", tag: "Quarto", nome: "Jogos americanos, toalhas de mesa", meta: 1, adquirido: 0, obs: "" },
+      { cat: "Cama, Banho e Quarto", tag: "Quarto", nome: "Cabides e Organizadores", meta: 1, adquirido: 0, obs: "" },
+
+      // Lavanderia e Banheiro
+      { cat: "Lavanderia e Banheiro", tag: "Lavanderia", nome: "Kit acessórios (saboneteira, porta papel)", meta: 1, adquirido: 0, obs: "" },
+      { cat: "Lavanderia e Banheiro", tag: "Lavanderia", nome: "Cesto de roupa, lixeira e escova", meta: 3, adquirido: 1, obs: "Já temos: Cesto de roupa suja" },
+      { cat: "Lavanderia e Banheiro", tag: "Lavanderia", nome: "Espelho e Kit Primeiros Socorros", meta: 2, adquirido: 0, obs: "" },
+      { cat: "Lavanderia e Banheiro", tag: "Lavanderia", nome: "Vassouras, rodo, pá de lixo e esfregão", meta: 1, adquirido: 0, obs: "" },
+      { cat: "Lavanderia e Banheiro", tag: "Lavanderia", nome: "Baldes, bacias e tábua de passar roupa", meta: 1, adquirido: 0, obs: "" },
+      { cat: "Lavanderia e Banheiro", tag: "Lavanderia", nome: "Vaso sanitário (com caixa acoplada)", meta: 1, adquirido: 0, obs: "" },
+      { cat: "Lavanderia e Banheiro", tag: "Lavanderia", nome: "Chuveiro elétrico", meta: 1, adquirido: 0, obs: "" },
+      { cat: "Lavanderia e Banheiro", tag: "Lavanderia", nome: "Pia (cuba)", meta: 1, adquirido: 0, obs: "" },
+
+      // Sala, Decoração e Extras
+      { cat: "Sala & Extras", tag: "Sala", nome: "Cortinas", meta: 2, adquirido: 0, obs: "" },
+      { cat: "Sala & Extras", tag: "Sala", nome: "Almofadas decorativas e manta para sofá", meta: 1, adquirido: 0, obs: "" },
+      { cat: "Sala & Extras", tag: "Sala", nome: "Luminárias, abajures, quadros e plantas", meta: 1, adquirido: 0, obs: "" },
+      { cat: "Sala & Extras", tag: "Sala", nome: "Tapetes", meta: 3, adquirido: 0, obs: "" }
+    ];
+
+    function renderCards(lista) {
+      const grid = document.getElementById("itensGrid");
+      grid.innerHTML = "";
+
+      lista.forEach(item => {
+        const pct = Math.min(100, Math.round((item.adquirido / item.meta) * 100));
+        const faltam = Math.max(0, item.meta - item.adquirido);
+        const completo = item.adquirido >= item.meta;
+
+        let statusClass = "status-missing";
+        let statusText = `Faltam ${faltam}`;
+        let progressColor = "var(--danger)";
+
+        if (completo) {
+          statusClass = "status-done";
+          statusText = "Meta Batida!";
+          progressColor = "var(--success)";
+        } else if (item.adquirido > 0) {
+          statusClass = "status-partial";
+          statusText = `Faltam ${faltam}`;
+          progressColor = "var(--pending)";
+        }
+
+        const msgZap = encodeURIComponent(`Olá Matheus e Maria Clara! Gostaria de presentear vocês com o item: *${item.nome}* do enxoval.`);
+        const linkZap = `https://wa.me/${SEU_WHATSAPP}?text=${msgZap}`;
+
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <div>
+            <div class="card-category">${item.cat}</div>
+            <div class="card-title">${item.nome}</div>
+            ${item.obs ? `<div class="card-details">${item.obs}</div>` : ''}
+            
+            <div class="progress-container">
+              <div class="progress-info">
+                <span class="status-badge ${statusClass}">${statusText}</span>
+                <span style="color: var(--text-sub)">${item.adquirido}/${item.meta}</span>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: ${pct}%; background-color: ${progressColor};"></div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            ${completo 
+              ? `<span class="action-btn btn-completed">Item Já Garantido</span>`
+              : `<a href="${linkZap}" target="_blank" class="action-btn btn-available">Quero Presentear</a>`
+            }
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function filtrar(filtro) {
+      // Alterna classes ativas dos botões
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('onclick').includes(`'${filtro}'`));
+      });
+
+      if (filtro === 'todos') {
+        renderCards(dados);
+      } else {
+        renderCards(dados.filter(item => item.tag === filtro));
+      }
+    }
+
+    // Inicializa a página
+    renderCards(dados);
+  </script>
+</body>
+</html>
