@@ -33,7 +33,7 @@
     body {
       background-color: var(--bg);
       color: var(--text-main);
-      padding: 28px 16px 80px;
+      padding: 28px 16px 120px; /* Espaço extra embaixo para não cobrir itens com o carrinho */
       min-height: 100vh;
     }
 
@@ -234,6 +234,11 @@
       transform: translateY(-2px);
     }
 
+    .card.selected-card {
+      border-color: var(--accent);
+      background: #18283f;
+    }
+
     .card-header-line {
       display: flex;
       justify-content: space-between;
@@ -327,11 +332,12 @@
       display: block;
       width: 100%;
       text-align: center;
-      text-decoration: none;
+      border: none;
       font-size: 0.85rem;
       font-weight: 600;
       padding: 10px 14px;
       border-radius: 10px;
+      cursor: pointer;
       transition: all 0.2s;
     }
 
@@ -344,11 +350,210 @@
       background: var(--accent-hover);
     }
 
+    .btn-selected {
+      background: #dc2626;
+      color: #ffffff;
+    }
+
+    .btn-selected:hover {
+      background: #b91c1c;
+    }
+
     .btn-completed {
       background: #334155;
       color: #64748b;
       cursor: not-allowed;
       pointer-events: none;
+    }
+
+    /* Barra Fixa Flutuante do Carrinho */
+    .cart-bar {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(120px);
+      background: #0f172a;
+      border: 1px solid var(--accent);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+      padding: 12px 20px;
+      border-radius: 50px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      z-index: 100;
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      max-width: 90%;
+      width: auto;
+    }
+
+    .cart-bar.visible {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .cart-info {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-main);
+      white-space: nowrap;
+    }
+
+    .cart-count-badge {
+      background: var(--accent);
+      color: #0f172a;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      margin-right: 4px;
+    }
+
+    .btn-cart-action {
+      background: var(--accent);
+      color: #0f172a;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-cart-action:hover {
+      background: var(--accent-hover);
+    }
+
+    /* Modal de Confirmação */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      padding: 16px;
+    }
+
+    .modal-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-box {
+      background: #1e293b;
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      width: 100%;
+      max-width: 480px;
+      padding: 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-header {
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .modal-header h2 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    .modal-header p {
+      font-size: 0.85rem;
+      color: var(--text-sub);
+    }
+
+    .modal-list {
+      list-style: none;
+      overflow-y: auto;
+      margin: 10px 0 20px;
+      padding: 0 4px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .modal-list-item {
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+      padding: 10px 14px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9rem;
+    }
+
+    .item-nome-texto {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+    }
+
+    .btn-remove-item {
+      background: transparent;
+      border: none;
+      color: var(--danger);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    .modal-footer {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .btn-confirm-zap {
+      background: #22c55e;
+      color: #0f172a;
+      text-decoration: none;
+      text-align: center;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 12px;
+      border-radius: 12px;
+      transition: background 0.2s;
+    }
+
+    .btn-confirm-zap:hover {
+      background: #16a34a;
+    }
+
+    .btn-close-modal {
+      background: transparent;
+      border: 1px solid var(--card-border);
+      color: var(--text-sub);
+      font-size: 0.85rem;
+      padding: 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .btn-close-modal:hover {
+      background: #334155;
+      color: var(--text-main);
     }
   </style>
 </head>
@@ -398,6 +603,29 @@
     </div>
   </div>
 
+  <!-- Barra Flutuante da Sacola/Carrinho -->
+  <div id="cartBar" class="cart-bar">
+    <div class="cart-info">
+      <span class="cart-count-badge" id="cartCount">0</span> selecionado(s)
+    </div>
+    <button class="btn-cart-action" onclick="abrirModal()">Ver Lista / Confirmar 🎁</button>
+  </div>
+
+  <!-- Modal de Confirmação -->
+  <div id="modalConfirmacao" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2>Seus presentes escolhidos</h2>
+        <p>Verifique se os itens abaixo estão corretos antes de nos avisar no WhatsApp:</p>
+      </div>
+      <ul id="modalItensLista" class="modal-list"></ul>
+      <div class="modal-footer">
+        <a id="btnZapFinal" href="#" target="_blank" class="btn-confirm-zap">Confirmar e Enviar pelo WhatsApp</a>
+        <button class="btn-close-modal" onclick="fecharModal()">Continuar Escolhendo</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTcArOJ3RHAqX_nxVaI13pN-CUr6Y9cNVKJdrTHhpbD0D6qoYKZz28DOANhwOeV_QmGEajsLJTcLD9c/pub?gid=1718907358&single=true&output=csv";
     const SEU_WHATSAPP = "75988660943";
@@ -418,6 +646,7 @@
     let todosOsItens = [];
     let filtroAtual = 'todos';
     let termoBusca = '';
+    let itensSelecionados = []; // Guarda os itens adicionados ao carrinho
 
     function copiarPix(btn) {
       navigator.clipboard.writeText(CHAVE_PIX).then(() => {
@@ -476,7 +705,7 @@
         const csvText = await res.text();
         const linhas = parseCSV(csvText);
 
-        todosOsItens = linhas.slice(1).map(col => {
+        todosOsItens = linhas.slice(1).map((col, idx) => {
           const catOriginal = (col[0] || "").trim();
           const item = (col[1] || "").trim();
           const meta = parseInt(col[2], 10) || 1;
@@ -484,6 +713,7 @@
           const tag = mapearTag(catOriginal);
 
           return {
+            id: idx + "_" + item.replace(/\s+/g, ''),
             cat: catOriginal,
             tag: tag,
             nome: item,
@@ -502,6 +732,78 @@
             Erro ao carregar a planilha. Verifique se o link CSV está publicado corretamente.
           </div>
         `;
+      }
+    }
+
+    function alternarSelecao(id) {
+      const item = todosOsItens.find(i => i.id === id);
+      if (!item) return;
+
+      const index = itensSelecionados.findIndex(i => i.id === id);
+      if (index > -1) {
+        itensSelecionados.splice(index, 1);
+      } else {
+        itensSelecionados.push(item);
+      }
+
+      atualizarBarraCarrinho();
+      renderCards();
+    }
+
+    function atualizarBarraCarrinho() {
+      const bar = document.getElementById("cartBar");
+      const count = document.getElementById("cartCount");
+      const total = itensSelecionados.length;
+
+      count.innerText = total;
+
+      if (total > 0) {
+        bar.classList.add("visible");
+      } else {
+        bar.classList.remove("visible");
+        fecharModal();
+      }
+    }
+
+    function abrirModal() {
+      if (itensSelecionados.length === 0) return;
+
+      const lista = document.getElementById("modalItensLista");
+      lista.innerHTML = "";
+
+      let textoMensagemZap = "Olá Matheus e Maria Clara! Escolhi estes itens para presentear vocês no enxoval:\n\n";
+
+      itensSelecionados.forEach(item => {
+        const obsCor = item.corPreta ? " (Preferência: Cor Preta)" : "";
+        textoMensagemZap += `• *${item.nome}*${obsCor}\n`;
+
+        const li = document.createElement("li");
+        li.className = "modal-list-item";
+        li.innerHTML = `
+          <div class="item-nome-texto">
+            <span>🎁 ${item.nome}</span>
+            ${item.corPreta ? '<span class="badge-cor-preta">Preta</span>' : ''}
+          </div>
+          <button class="btn-remove-item" onclick="removerDoModal('${item.id}')">Remover</button>
+        `;
+        lista.appendChild(li);
+      });
+
+      textoMensagemZap += "\nVocês ainda estão precisando deles?";
+      const linkZap = `https://wa.me/${SEU_WHATSAPP}?text=${encodeURIComponent(textoMensagemZap)}`;
+      document.getElementById("btnZapFinal").href = linkZap;
+
+      document.getElementById("modalConfirmacao").classList.add("open");
+    }
+
+    function fecharModal() {
+      document.getElementById("modalConfirmacao").classList.remove("open");
+    }
+
+    function removerDoModal(id) {
+      alternarSelecao(id);
+      if (itensSelecionados.length > 0) {
+        abrirModal();
       }
     }
 
@@ -525,6 +827,7 @@
         const pct = Math.min(100, Math.round((item.adquirido / item.meta) * 100));
         const faltam = Math.max(0, item.meta - item.adquirido);
         const completo = item.adquirido >= item.meta;
+        const estaSelecionado = itensSelecionados.some(i => i.id === item.id);
 
         let statusClass = "status-missing";
         let statusText = `Faltam ${faltam}`;
@@ -540,13 +843,8 @@
           progressColor = "var(--pending)";
         }
 
-        const msgTexto = item.corPreta 
-          ? `Olá Matheus e Maria Clara! Gostaria de presentear vocês com o item: *${item.nome}* (Preferencialmente na Cor Preta) do enxoval.`
-          : `Olá Matheus e Maria Clara! Gostaria de presentear vocês com o item: *${item.nome}* do enxoval.`;
-        const linkZap = `https://wa.me/${SEU_WHATSAPP}?text=${encodeURIComponent(msgTexto)}`;
-
         const card = document.createElement("div");
-        card.className = "card";
+        card.className = `card ${estaSelecionado ? 'selected-card' : ''}`;
         card.innerHTML = `
           <div>
             <div class="card-header-line">
@@ -569,7 +867,9 @@
           <div class="card-actions">
             ${completo 
               ? `<span class="action-btn btn-completed">Item Já Garantido</span>`
-              : `<a href="${linkZap}" target="_blank" class="action-btn btn-available">Presentear via WhatsApp</a>`
+              : estaSelecionado
+                ? `<button onclick="alternarSelecao('${item.id}')" class="action-btn btn-selected">✓ Escolhido (Remover)</button>`
+                : `<button onclick="alternarSelecao('${item.id}')" class="action-btn btn-available">+ Escolher este Presente</button>`
             }
           </div>
         `;
