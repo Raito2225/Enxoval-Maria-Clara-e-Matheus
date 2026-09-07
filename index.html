@@ -8,7 +8,7 @@
   <style>
     :root {
       --bg: #0b1120;
-      --card-bg: rgba(30, 41, 59, 0.85); /* Efeito de vidro translúcido */
+      --card-bg: rgba(30, 41, 59, 0.85);
       --card-border: rgba(51, 65, 85, 0.8);
       --text-main: #f8fafc;
       --text-sub: #94a3b8;
@@ -38,7 +38,6 @@
       position: relative;
     }
 
-   /* Foto de casal translúcida no fundo */
     body::before {
       content: "";
       position: fixed;
@@ -47,7 +46,7 @@
       width: 100%;
       height: 100%;
       background-image: url('foto.jpg');
-      background-position: center 20%; /* <-- AJUSTE AQUI */
+      background-position: center 20%;
       background-repeat: no-repeat;
       background-size: cover;
       opacity: 0.18;
@@ -377,15 +376,6 @@
       background: var(--accent-hover);
     }
 
-    .btn-selected {
-      background: #dc2626;
-      color: #ffffff;
-    }
-
-    .btn-selected:hover {
-      background: #b91c1c;
-    }
-
     .btn-completed {
       background: #334155;
       color: #64748b;
@@ -393,7 +383,57 @@
       pointer-events: none;
     }
 
-.cart-bar {
+    /* Controles de Quantidade no Card */
+    .qty-control-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #0f172a;
+      border: 1px solid var(--accent);
+      border-radius: 10px;
+      padding: 4px;
+    }
+
+    .qty-btn {
+      background: #1e293b;
+      color: var(--accent);
+      border: 1px solid var(--card-border);
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      font-size: 1.15rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .qty-btn:hover {
+      background: var(--accent);
+      color: #0f172a;
+    }
+
+    .qty-btn-minus {
+      color: var(--danger);
+    }
+
+    .qty-btn-minus:hover {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .qty-number-display {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-main);
+      text-align: center;
+      flex: 1;
+    }
+
+    /* Barra Fixa Flutuante do Carrinho */
+    .cart-bar {
       position: fixed;
       bottom: 20px;
       left: 50%;
@@ -454,24 +494,17 @@
       background: var(--accent-hover);
     }
 
-    /* Ajuste para telas pequenas */
     @media (max-width: 400px) {
       .cart-bar {
         padding: 8px 12px;
         gap: 8px;
         bottom: 12px;
       }
-
-      .cart-info {
-        font-size: 0.75rem;
-      }
-
-      .btn-cart-action {
-        padding: 8px 12px;
-        font-size: 0.75rem;
-      }
+      .cart-info { font-size: 0.75rem; }
+      .btn-cart-action { padding: 8px 12px; font-size: 0.75rem; }
     }
 
+    /* Modal de Confirmação */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -544,24 +577,54 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.9rem;
+      gap: 12px;
     }
 
-    .item-nome-texto {
+    .modal-item-left {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .modal-item-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .modal-qty-control {
       display: flex;
       align-items: center;
-      gap: 6px;
-      font-weight: 500;
+      gap: 8px;
     }
 
-    .btn-remove-item {
-      background: transparent;
-      border: none;
-      color: var(--danger);
-      font-size: 0.8rem;
-      font-weight: 600;
+    .modal-qty-btn {
+      background: #1e293b;
+      border: 1px solid var(--card-border);
+      color: var(--accent);
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      font-weight: 700;
       cursor: pointer;
-      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .modal-qty-btn:hover {
+      background: var(--accent);
+      color: #0f172a;
+    }
+
+    .modal-qty-val {
+      font-size: 0.85rem;
+      font-weight: 700;
+      min-width: 20px;
+      text-align: center;
+      color: var(--text-main);
     }
 
     .modal-footer {
@@ -650,18 +713,20 @@
     </div>
   </div>
 
+  <!-- Barra Flutuante da Sacola/Carrinho -->
   <div id="cartBar" class="cart-bar">
     <div class="cart-info">
-      <span class="cart-count-badge" id="cartCount">0</span> selecionado(s)
+      <span class="cart-count-badge" id="cartCount">0</span> presente(s)
     </div>
     <button class="btn-cart-action" onclick="abrirModal()">Ver Lista / Confirmar 🎁</button>
   </div>
 
+  <!-- Modal de Confirmação -->
   <div id="modalConfirmacao" class="modal-overlay">
     <div class="modal-box">
       <div class="modal-header">
         <h2>Seus presentes escolhidos</h2>
-        <p>Verifique se os itens abaixo estão corretos antes de nos avisar no WhatsApp:</p>
+        <p>Ajuste as quantidades se desejar e confirme para nos avisar no WhatsApp:</p>
       </div>
       <ul id="modalItensLista" class="modal-list"></ul>
       <div class="modal-footer">
@@ -673,7 +738,7 @@
 
   <script>
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTcArOJ3RHAqX_nxVaI13pN-CUr6Y9cNVKJdrTHhpbD0D6qoYKZz28DOANhwOeV_QmGEajsLJTcLD9c/pub?gid=1718907358&single=true&output=csv";
-    const SEU_WHATSAPP = "75981821697";
+    const SEU_WHATSAPP = "75988660943";
     const CHAVE_PIX = "matheusgomes2225@hotmail.com";
 
     function checarSeItemPreto(nome) {
@@ -691,7 +756,8 @@
     let todosOsItens = [];
     let filtroAtual = 'todos';
     let termoBusca = '';
-    let itensSelecionados = [];
+    // Mapeamento id -> quantidade selecionada
+    let carrinho = {};
 
     function copiarPix(btn) {
       navigator.clipboard.writeText(CHAVE_PIX).then(() => {
@@ -758,12 +824,13 @@
           const tag = mapearTag(catOriginal);
 
           return {
-            id: idx + "_" + item.replace(/\s+/g, ''),
+            id: "item_" + idx,
             cat: catOriginal,
             tag: tag,
             nome: item,
             meta: meta,
             adquirido: adquirido,
+            faltam: Math.max(0, meta - adquirido),
             corPreta: checarSeItemPreto(item)
           };
         })
@@ -780,29 +847,45 @@
       }
     }
 
-    function alternarSelecao(id) {
+    function alterarQtd(id, delta) {
       const item = todosOsItens.find(i => i.id === id);
-      if (!item) return;
+      if (!item || item.faltam <= 0) return;
 
-      const index = itensSelecionados.findIndex(i => i.id === id);
-      if (index > -1) {
-        itensSelecionados.splice(index, 1);
-      } else {
-        itensSelecionados.push(item);
+      const atual = carrinho[id] || 0;
+      const novaQtd = atual + delta;
+
+      if (novaQtd <= 0) {
+        delete carrinho[id];
+      } else if (novaQtd <= item.faltam) {
+        carrinho[id] = novaQtd;
       }
 
       atualizarBarraCarrinho();
       renderCards();
+      
+      const modal = document.getElementById("modalConfirmacao");
+      if (modal.classList.contains("open")) {
+        if (Object.keys(carrinho).length > 0) {
+          abrirModal();
+        } else {
+          fecharModal();
+        }
+      }
     }
 
     function atualizarBarraCarrinho() {
       const bar = document.getElementById("cartBar");
       const count = document.getElementById("cartCount");
-      const total = itensSelecionados.length;
+      
+      // Total de itens físicos somados
+      let totalUnidades = 0;
+      for (const id in carrinho) {
+        totalUnidades += carrinho[id];
+      }
 
-      count.innerText = total;
+      count.innerText = totalUnidades;
 
-      if (total > 0) {
+      if (totalUnidades > 0) {
         bar.classList.add("visible");
       } else {
         bar.classList.remove("visible");
@@ -811,30 +894,41 @@
     }
 
     function abrirModal() {
-      if (itensSelecionados.length === 0) return;
+      const ids = Object.keys(carrinho);
+      if (ids.length === 0) return;
 
       const lista = document.getElementById("modalItensLista");
       lista.innerHTML = "";
 
-      let textoMensagemZap = "Olá Matheus e Maria Clara! Escolhi estes itens para presentear vocês no enxoval:\n\n";
+      let textoMensagemZap = "Olá Matheus e Maria Clara! Gostaria de presentear vocês no enxoval com:\n\n";
 
-      itensSelecionados.forEach(item => {
+      ids.forEach(id => {
+        const item = todosOsItens.find(i => i.id === id);
+        if (!item) return;
+
+        const qtd = carrinho[id];
         const obsCor = item.corPreta ? " (Preferência: Cor Preta)" : "";
-        textoMensagemZap += `• *${item.nome}*${obsCor}\n`;
+        const termoQtd = qtd > 1 ? `${qtd} unidades` : "1 unidade";
+        
+        textoMensagemZap += `• *${item.nome}* — ${termoQtd}${obsCor}\n`;
 
         const li = document.createElement("li");
         li.className = "modal-list-item";
         li.innerHTML = `
-          <div class="item-nome-texto">
-            <span>🎁 ${item.nome}</span>
-            ${item.corPreta ? '<span class="badge-cor-preta">Preta</span>' : ''}
+          <div class="modal-item-left">
+            <span class="modal-item-title">${item.nome}</span>
+            ${item.corPreta ? '<span style="color:var(--accent); font-size:0.75rem;">Preferência: Cor Preta</span>' : ''}
           </div>
-          <button class="btn-remove-item" onclick="removerDoModal('${item.id}')">Remover</button>
+          <div class="modal-qty-control">
+            <button class="modal-qty-btn" onclick="alterarQtd('${item.id}', -1)">-</button>
+            <span class="modal-qty-val">${qtd}</span>
+            <button class="modal-qty-btn" onclick="alterarQtd('${item.id}', 1)" ${qtd >= item.faltam ? 'disabled style="opacity:0.4;cursor:not-allowed;"' : ''}>+</button>
+          </div>
         `;
         lista.appendChild(li);
       });
 
-      textoMensagemZap += "\nVocês ainda estão precisando deles?";
+      textoMensagemZap += "\nVocês ainda estão precisando dessa quantidade?";
       const linkZap = `https://wa.me/${SEU_WHATSAPP}?text=${encodeURIComponent(textoMensagemZap)}`;
       document.getElementById("btnZapFinal").href = linkZap;
 
@@ -843,13 +937,6 @@
 
     function fecharModal() {
       document.getElementById("modalConfirmacao").classList.remove("open");
-    }
-
-    function removerDoModal(id) {
-      alternarSelecao(id);
-      if (itensSelecionados.length > 0) {
-        abrirModal();
-      }
     }
 
     function renderCards() {
@@ -870,12 +957,11 @@
 
       lista.forEach(item => {
         const pct = Math.min(100, Math.round((item.adquirido / item.meta) * 100));
-        const faltam = Math.max(0, item.meta - item.adquirido);
         const completo = item.adquirido >= item.meta;
-        const estaSelecionado = itensSelecionados.some(i => i.id === item.id);
+        const qtdSelecionada = carrinho[item.id] || 0;
 
         let statusClass = "status-missing";
-        let statusText = `Faltam ${faltam}`;
+        let statusText = `Faltam ${item.faltam}`;
         let progressColor = "var(--danger)";
 
         if (completo) {
@@ -884,12 +970,28 @@
           progressColor = "var(--success)";
         } else if (item.adquirido > 0) {
           statusClass = "status-partial";
-          statusText = `Faltam ${faltam}`;
+          statusText = `Faltam ${item.faltam}`;
           progressColor = "var(--pending)";
         }
 
         const card = document.createElement("div");
-        card.className = `card ${estaSelecionado ? 'selected-card' : ''}`;
+        card.className = `card ${qtdSelecionada > 0 ? 'selected-card' : ''}`;
+        
+        let acaoHTML = '';
+        if (completo) {
+          acaoHTML = `<span class="action-btn btn-completed">Item Já Garantido</span>`;
+        } else if (qtdSelecionada === 0) {
+          acaoHTML = `<button onclick="alterarQtd('${item.id}', 1)" class="action-btn btn-available">+ Escolher este Presente</button>`;
+        } else {
+          acaoHTML = `
+            <div class="qty-control-box">
+              <button class="qty-btn qty-btn-minus" onclick="alterarQtd('${item.id}', -1)">-</button>
+              <span class="qty-number-display">${qtdSelecionada} de ${item.faltam} escolhido(s)</span>
+              <button class="qty-btn" onclick="alterarQtd('${item.id}', 1)" ${qtdSelecionada >= item.faltam ? 'disabled style="opacity:0.3;cursor:not-allowed;"' : ''}>+</button>
+            </div>
+          `;
+        }
+
         card.innerHTML = `
           <div>
             <div class="card-header-line">
@@ -910,12 +1012,7 @@
           </div>
 
           <div class="card-actions">
-            ${completo 
-              ? `<span class="action-btn btn-completed">Item Já Garantido</span>`
-              : estaSelecionado
-                ? `<button onclick="alternarSelecao('${item.id}')" class="action-btn btn-selected">✓ Escolhido (Remover)</button>`
-                : `<button onclick="alternarSelecao('${item.id}')" class="action-btn btn-available">+ Escolher este Presente</button>`
-            }
+            ${acaoHTML}
           </div>
         `;
         grid.appendChild(card);
