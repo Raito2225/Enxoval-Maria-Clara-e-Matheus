@@ -249,7 +249,6 @@
       color: var(--accent);
     }
 
-    /* Badge destacando a cor preta */
     .badge-cor-preta {
       font-size: 0.7rem;
       font-weight: 700;
@@ -396,7 +395,7 @@
 
     <div class="filters">
       <button class="filter-btn active" onclick="filtrar('todos')">Todos</button>
-      <button class="filter-btn" onclick="filtrar('Cozinha')">Cozinha (Itens Pretos)</button>
+      <button class="filter-btn" onclick="filtrar('Cozinha')">Cozinha</button>
       <button class="filter-btn" onclick="filtrar('Eletro')">Eletro & Mobília</button>
       <button class="filter-btn" onclick="filtrar('Quarto')">Cama & Banho</button>
       <button class="filter-btn" onclick="filtrar('Lavanderia')">Lavanderia & Banheiro</button>
@@ -412,6 +411,19 @@
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTcArOJ3RHAqX_nxVaI13pN-CUr6Y9cNVKJdrTHhpbD0D6qoYKZz28DOANhwOeV_QmGEajsLJTcLD9c/pub?gid=1718907358&single=true&output=csv";
     const SEU_WHATSAPP = "75988660943";
     const CHAVE_PIX = "matheusgomes2225@hotmail.com";
+
+    // Apenas estes itens terão o destaque de cor preta
+    function checarSeItemPreto(nome) {
+      const n = (nome || "").toLowerCase();
+      return (
+        n.includes("talher") || 
+        n.includes("faqueiro") || 
+        n.includes("térmica") || 
+        n.includes("termica") || 
+        n.includes("escorredor de louça") || 
+        n.includes("escorredor de louca")
+      );
+    }
 
     let todosOsItens = [];
     let filtroAtual = 'todos';
@@ -483,13 +495,13 @@
           const tag = mapearTag(catOriginal);
 
           return {
-            cat: tag === "Cozinha" ? "Cozinha (Cor Preta)" : catOriginal,
+            cat: catOriginal,
             tag: tag,
             nome: item,
             meta: meta,
             adquirido: adquirido,
             obs: obs,
-            isCozinha: tag === "Cozinha"
+            corPreta: checarSeItemPreto(item)
           };
         })
         .filter(item => item.nome !== "")
@@ -541,9 +553,8 @@
           progressColor = "var(--pending)";
         }
 
-        // Se for de cozinha, detalha a cor preta na mensagem do WhatsApp também
-        const msgTexto = item.isCozinha 
-          ? `Olá Matheus e Maria Clara! Gostaria de presentear vocês com o item: *${item.nome}* (Cor Preta) do enxoval.`
+        const msgTexto = item.corPreta 
+          ? `Olá Matheus e Maria Clara! Gostaria de presentear vocês com o item: *${item.nome}* (Preferencialmente na Cor Preta) do enxoval.`
           : `Olá Matheus e Maria Clara! Gostaria de presentear vocês com o item: *${item.nome}* do enxoval.`;
         const linkZap = `https://wa.me/${SEU_WHATSAPP}?text=${encodeURIComponent(msgTexto)}`;
 
@@ -553,7 +564,7 @@
           <div>
             <div class="card-header-line">
               <span class="card-category">${item.cat}</span>
-              ${item.isCozinha ? `<span class="badge-cor-preta">● Cor: Preta</span>` : ''}
+              ${item.corPreta ? `<span class="badge-cor-preta">● Cor: Preta</span>` : ''}
             </div>
             <div class="card-title">${item.nome}</div>
             ${item.obs ? `<div class="card-details">${item.obs}</div>` : ''}
