@@ -393,7 +393,7 @@
       pointer-events: none;
     }
 
-    .cart-bar {
+.cart-bar {
       position: fixed;
       bottom: 20px;
       left: 50%;
@@ -402,15 +402,16 @@
       backdrop-filter: blur(16px);
       border: 1px solid var(--accent);
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
-      padding: 12px 20px;
+      padding: 10px 16px;
       border-radius: 50px;
       display: flex;
       align-items: center;
-      gap: 16px;
+      justify-content: space-between;
+      gap: 12px;
       z-index: 100;
       transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      max-width: 90%;
-      width: auto;
+      width: calc(100% - 32px);
+      max-width: 440px;
     }
 
     .cart-bar.visible {
@@ -418,18 +419,19 @@
     }
 
     .cart-info {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       font-weight: 600;
       color: var(--text-main);
       white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .cart-count-badge {
       background: var(--accent);
       color: #0f172a;
-      padding: 2px 8px;
+      padding: 2px 7px;
       border-radius: 12px;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       font-weight: 700;
       margin-right: 4px;
     }
@@ -438,17 +440,36 @@
       background: var(--accent);
       color: #0f172a;
       border: none;
-      padding: 10px 18px;
+      padding: 9px 14px;
       border-radius: 999px;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: 700;
       cursor: pointer;
       transition: background 0.2s;
       white-space: nowrap;
+      flex-shrink: 0;
     }
 
     .btn-cart-action:hover {
       background: var(--accent-hover);
+    }
+
+    /* Ajuste para telas pequenas */
+    @media (max-width: 400px) {
+      .cart-bar {
+        padding: 8px 12px;
+        gap: 8px;
+        bottom: 12px;
+      }
+
+      .cart-info {
+        font-size: 0.75rem;
+      }
+
+      .btn-cart-action {
+        padding: 8px 12px;
+        font-size: 0.75rem;
+      }
     }
 
     .modal-overlay {
@@ -652,7 +673,7 @@
 
   <script>
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTcArOJ3RHAqX_nxVaI13pN-CUr6Y9cNVKJdrTHhpbD0D6qoYKZz28DOANhwOeV_QmGEajsLJTcLD9c/pub?gid=1718907358&single=true&output=csv";
-    const SEU_WHATSAPP = "75988660943";
+    const SEU_WHATSAPP = "75981821697";
     const CHAVE_PIX = "matheusgomes2225@hotmail.com";
 
     function checarSeItemPreto(nome) {
