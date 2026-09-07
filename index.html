@@ -266,15 +266,6 @@
       font-size: 1.05rem;
       font-weight: 600;
       line-height: 1.35;
-      margin-bottom: 12px;
-    }
-
-    .card-details {
-      font-size: 0.8rem;
-      color: var(--text-sub);
-      background: #0f172a;
-      padding: 8px 12px;
-      border-radius: 8px;
       margin-bottom: 16px;
     }
 
@@ -412,7 +403,6 @@
     const SEU_WHATSAPP = "75988660943";
     const CHAVE_PIX = "matheusgomes2225@hotmail.com";
 
-    // Apenas estes itens terão o destaque de cor preta
     function checarSeItemPreto(nome) {
       const n = (nome || "").toLowerCase();
       return (
@@ -491,7 +481,6 @@
           const item = (col[1] || "").trim();
           const meta = parseInt(col[2], 10) || 1;
           const adquirido = parseInt(col[3], 10) || 0;
-          const obs = (col[5] || "").trim();
           const tag = mapearTag(catOriginal);
 
           return {
@@ -500,7 +489,6 @@
             nome: item,
             meta: meta,
             adquirido: adquirido,
-            obs: obs,
             corPreta: checarSeItemPreto(item)
           };
         })
@@ -524,8 +512,7 @@
       const lista = todosOsItens.filter(item => {
         const correspondeCategoria = (filtroAtual === 'todos' || item.tag === filtroAtual);
         const correspondeBusca = item.nome.toLowerCase().includes(termoBusca) || 
-                                 item.cat.toLowerCase().includes(termoBusca) || 
-                                 item.obs.toLowerCase().includes(termoBusca);
+                                 item.cat.toLowerCase().includes(termoBusca);
         return correspondeCategoria && correspondeBusca;
       });
 
@@ -567,7 +554,6 @@
               ${item.corPreta ? `<span class="badge-cor-preta">● Cor: Preta</span>` : ''}
             </div>
             <div class="card-title">${item.nome}</div>
-            ${item.obs ? `<div class="card-details">${item.obs}</div>` : ''}
             
             <div class="progress-container">
               <div class="progress-info">
