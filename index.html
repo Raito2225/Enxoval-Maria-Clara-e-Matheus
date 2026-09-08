@@ -810,7 +810,7 @@
       return "Sala";
     }
 
-    async function carregarDadosPlanilha() {
+   async function carregarDadosPlanilha() {
       try {
         const res = await fetch(CSV_URL);
         const csvText = await res.text();
@@ -819,9 +819,16 @@
         todosOsItens = linhas.slice(1).map((col, idx) => {
           const catOriginal = (col[0] || "").trim();
           const item = (col[1] || "").trim();
-          const meta = parseInt(col[2], 10) || 1;
+          const metaBruta = (col[2] || "").trim().toLowerCase();
           const adquirido = parseInt(col[3], 10) || 0;
           const tag = mapearTag(catOriginal);
+
+          // Verifica se é item sem limite (livre)
+          const ehLivre = metaBruta === "" || metaBruta === "0" || metaBruta.includes("livre") || metaBruta.includes("sem");
+          const meta = ehLivre ? null : (parseInt(metaBruta, 10) || 1);
+          
+          // Se for livre, faltam "infinitos". Se não, faz a conta normal.
+          const faltam = ehLivre ? Infinity : Math.max(0, meta - adquirido);
 
           return {
             id: "item_" + idx,
@@ -829,14 +836,23 @@
             tag: tag,
             nome: item,
             meta: meta,
+            ehLivre: ehLivre, // A etiqueta que estava faltando!
             adquirido: adquirido,
-            faltam: Math.max(0, meta - adquirido),
+            faltam: faltam,   // A conta corrigida!
             corPreta: checarSeItemPreto(item)
           };
         })
         .filter(item => item.nome !== "")
-        .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
-
+        .sort((a, b) => {
+          const aCompleto = !a.ehLivre && a.adquirido >= a.meta;
+          const bCompleto = !b.ehLivre && b.adquirido >= b.meta;
+          
+          if (aCompleto && !bCompleto) return 1;
+          if (!aCompleto && bCompleto) return -1;
+          
+          return a.nome.localeCompare(b.nome, 'pt-BR');
+        });
+        
         renderCards();
       } catch (err) {
         document.getElementById("itensGrid").innerHTML = `
@@ -928,7 +944,6 @@
         lista.appendChild(li);
       });
 
-      textoMensagemZap += "\nVocês ainda estão precisando dessa quantidade?";
       const linkZap = `https://wa.me/${SEU_WHATSAPP}?text=${encodeURIComponent(textoMensagemZap)}`;
       document.getElementById("btnZapFinal").href = linkZap;
 
@@ -939,7 +954,7 @@
       document.getElementById("modalConfirmacao").classList.remove("open");
     }
 
-    function renderCards() {
+function renderCards() {
       const grid = document.getElementById("itensGrid");
       grid.innerHTML = "";
 
@@ -947,7 +962,11 @@
         const correspondeCategoria = (filtroAtual === 'todos' || item.tag === filtroAtual);
         const correspondeBusca = item.nome.toLowerCase().includes(termoBusca) || 
                                  item.cat.toLowerCase().includes(termoBusca);
-        return correspondeCategoria && correspondeBusca;
+                                 
+        // O site agora enxerga a etiqueta "ehLivre" perfeitamente
+        const naoEstaCompleto = item.ehLivre || item.adquirido < item.meta;
+
+        return correspondeCategoria && correspondeBusca && naoEstaCompleto;
       });
 
       if (lista.length === 0) {
@@ -956,27 +975,36 @@
       }
 
       lista.forEach(item => {
-        const pct = Math.min(100, Math.round((item.adquirido / item.meta) * 100));
-        const completo = item.adquirido >= item.meta;
+        const completo = !item.ehLivre && item.adquirido >= item.meta;
         const qtdSelecionada = carrinho[item.id] || 0;
 
         let statusClass = "status-missing";
-        let statusText = `Faltam ${item.faltam}`;
-        let progressColor = "var(--danger)";
+        let statusText = item.ehLivre ? "Quantidade Livre" : `Faltam ${item.faltam}`;
+        let progressColor = item.ehLivre ? "var(--accent)" : "var(--danger)";
+        let pct = item.ehLivre ? 100 : Math.min(100, Math.round((item.adquirido / item.meta) * 100));
 
         if (completo) {
           statusClass = "status-done";
           statusText = "Meta Batida!";
           progressColor = "var(--success)";
-        } else if (item.adquirido > 0) {
+        } else if (!item.ehLivre && item.adquirido > 0) {
           statusClass = "status-partial";
           statusText = `Faltam ${item.faltam}`;
           progressColor = "var(--pending)";
+        } else if (item.ehLivre) {
+          statusClass = "status-partial";
+          progressColor = "var(--accent)";
         }
 
         const card = document.createElement("div");
         card.className = `card ${qtdSelecionada > 0 ? 'selected-card' : ''}`;
         
+        let textoQtdCard = item.ehLivre 
+          ? `${qtdSelecionada} escolhido(s)` 
+          : `${qtdSelecionada} de ${item.faltam} escolhido(s)`;
+
+        let podeMais = item.ehLivre || qtdSelecionada < item.faltam;
+
         let acaoHTML = '';
         if (completo) {
           acaoHTML = `<span class="action-btn btn-completed">Item Já Garantido</span>`;
@@ -986,8 +1014,8 @@
           acaoHTML = `
             <div class="qty-control-box">
               <button class="qty-btn qty-btn-minus" onclick="alterarQtd('${item.id}', -1)">-</button>
-              <span class="qty-number-display">${qtdSelecionada} de ${item.faltam} escolhido(s)</span>
-              <button class="qty-btn" onclick="alterarQtd('${item.id}', 1)" ${qtdSelecionada >= item.faltam ? 'disabled style="opacity:0.3;cursor:not-allowed;"' : ''}>+</button>
+              <span class="qty-number-display">${textoQtdCard}</span>
+              <button class="qty-btn" onclick="alterarQtd('${item.id}', 1)" ${!podeMais ? 'disabled style="opacity:0.3;cursor:not-allowed;"' : ''}>+</button>
             </div>
           `;
         }
@@ -1003,7 +1031,7 @@
             <div class="progress-container">
               <div class="progress-info">
                 <span class="status-badge ${statusClass}">${statusText}</span>
-                <span style="color: var(--text-sub)">${item.adquirido}/${item.meta}</span>
+                <span style="color: var(--text-sub)">${item.ehLivre ? (item.adquirido > 0 ? `${item.adquirido} já doado(s)` : 'Aberto') : `${item.adquirido}/${item.meta}`}</span>
               </div>
               <div class="progress-bar">
                 <div class="progress-fill" style="width: ${pct}%; background-color: ${progressColor};"></div>
