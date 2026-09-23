@@ -985,17 +985,17 @@
         const qtdSelecionada = carrinho[item.id] || 0;
 
         let statusClass = "status-missing";
-        let statusText = item.ehLivre ? "Quantidade Livre" : `Faltam ${item.faltam}`;
+        let statusText = item.ehLivre ? "Quantidade Livre" : `Precisamos de mais ${item.faltam}`;
         let progressColor = item.ehLivre ? "var(--accent)" : "var(--danger)";
         let pct = item.ehLivre ? 100 : Math.min(100, Math.round((item.adquirido / item.meta) * 100));
 
         if (completo) {
           statusClass = "status-done";
-          statusText = "✔️"; // Trocado para emoji de check (caso precise voltar a exibir um dia)
+          statusText = "✔️";
           progressColor = "var(--success)";
         } else if (!item.ehLivre && item.adquirido > 0) {
           statusClass = "status-partial";
-          statusText = `Faltam ${item.faltam}`;
+          statusText = `Precisamos de mais ${item.faltam}`;
           progressColor = "var(--pending)";
         } else if (item.ehLivre) {
           statusClass = "status-partial";
