@@ -425,7 +425,7 @@
     }
 
     .qty-number-display {
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       font-weight: 700;
       color: var(--text-main);
       text-align: center;
@@ -702,10 +702,10 @@
     <div class="filters">
       <button class="filter-btn active" onclick="filtrar('todos')">Todos</button>
       <button class="filter-btn" onclick="filtrar('Cozinha')">Cozinha</button>
-      <button class="filter-btn" onclick="filtrar('Eletro')">Eletro & Mobília</button>
-      <button class="filter-btn" onclick="filtrar('Quarto')">Cama & Banho</button>
-      <button class="filter-btn" onclick="filtrar('Lavanderia')">Lavanderia & Banheiro</button>
-      <button class="filter-btn" onclick="filtrar('Sala')">Sala & Extras</button>
+      <button class="filter-btn" onclick="filtrar('Eletrodomésticos e mobílias')">Eletrodomésticos e mobílias</button>
+      <button class="filter-btn" onclick="filtrar('Quarto')">Quarto</button>
+      <button class="filter-btn" onclick="filtrar('Banheiro')">Banheiro</button>
+      <button class="filter-btn" onclick="filtrar('Sala, decorações e extras')">Sala, decorações e extras</button>
     </div>
 
     <div id="itensGrid" class="grid">
@@ -804,13 +804,13 @@
     function mapearTag(categoria) {
       const cat = (categoria || "").toLowerCase();
       if (cat.includes("cozinha")) return "Cozinha";
-      if (cat.includes("eletro") || cat.includes("mobília")) return "Eletro";
-      if (cat.includes("cama") || cat.includes("quarto")) return "Quarto";
-      if (cat.includes("lavanderia") || cat.includes("banheiro")) return "Lavanderia";
-      return "Sala";
+      if (cat.includes("eletro") || cat.includes("mobília") || cat.includes("mobilia")) return "Eletrodomésticos e mobílias";
+      if (cat.includes("quarto") || cat.includes("cama")) return "Quarto";
+      if (cat.includes("banheiro") || cat.includes("lavanderia")) return "Banheiro";
+      return "Sala, decorações e extras";
     }
 
-   async function carregarDadosPlanilha() {
+    async function carregarDadosPlanilha() {
       try {
         const res = await fetch(CSV_URL);
         const csvText = await res.text();
@@ -836,9 +836,9 @@
             tag: tag,
             nome: item,
             meta: meta,
-            ehLivre: ehLivre, // A etiqueta que estava faltando!
+            ehLivre: ehLivre,
             adquirido: adquirido,
-            faltam: faltam,   // A conta corrigida!
+            faltam: faltam,
             corPreta: checarSeItemPreto(item)
           };
         })
@@ -865,14 +865,17 @@
 
     function alterarQtd(id, delta) {
       const item = todosOsItens.find(i => i.id === id);
-      if (!item || item.faltam <= 0) return;
+      if (!item) return;
+
+      // Impede adicionar se não é livre e não falta nada
+      if (!item.ehLivre && item.faltam <= 0 && delta > 0) return;
 
       const atual = carrinho[id] || 0;
       const novaQtd = atual + delta;
 
       if (novaQtd <= 0) {
         delete carrinho[id];
-      } else if (novaQtd <= item.faltam) {
+      } else if (item.ehLivre || novaQtd <= item.faltam) {
         carrinho[id] = novaQtd;
       }
 
@@ -928,6 +931,8 @@
         
         textoMensagemZap += `• *${item.nome}* — ${termoQtd}${obsCor}\n`;
 
+        const podeMaisModal = item.ehLivre || qtd < item.faltam;
+
         const li = document.createElement("li");
         li.className = "modal-list-item";
         li.innerHTML = `
@@ -938,7 +943,7 @@
           <div class="modal-qty-control">
             <button class="modal-qty-btn" onclick="alterarQtd('${item.id}', -1)">-</button>
             <span class="modal-qty-val">${qtd}</span>
-            <button class="modal-qty-btn" onclick="alterarQtd('${item.id}', 1)" ${qtd >= item.faltam ? 'disabled style="opacity:0.4;cursor:not-allowed;"' : ''}>+</button>
+            <button class="modal-qty-btn" onclick="alterarQtd('${item.id}', 1)" ${!podeMaisModal ? 'disabled style="opacity:0.4;cursor:not-allowed;"' : ''}>+</button>
           </div>
         `;
         lista.appendChild(li);
@@ -954,7 +959,7 @@
       document.getElementById("modalConfirmacao").classList.remove("open");
     }
 
-function renderCards() {
+    function renderCards() {
       const grid = document.getElementById("itensGrid");
       grid.innerHTML = "";
 
@@ -963,9 +968,10 @@ function renderCards() {
         const correspondeBusca = item.nome.toLowerCase().includes(termoBusca) || 
                                  item.cat.toLowerCase().includes(termoBusca);
                                  
-        // O site agora enxerga a etiqueta "ehLivre" perfeitamente
+        // O site enxerga a etiqueta "ehLivre" e verifica se ainda não atingiu a meta
         const naoEstaCompleto = item.ehLivre || item.adquirido < item.meta;
 
+        // Só retorna os itens que passam na categoria, na busca E que não estão completos
         return correspondeCategoria && correspondeBusca && naoEstaCompleto;
       });
 
@@ -985,7 +991,7 @@ function renderCards() {
 
         if (completo) {
           statusClass = "status-done";
-          statusText = "Meta Batida!";
+          statusText = "✔️"; // Trocado para emoji de check (caso precise voltar a exibir um dia)
           progressColor = "var(--success)";
         } else if (!item.ehLivre && item.adquirido > 0) {
           statusClass = "status-partial";
@@ -1059,6 +1065,13 @@ function renderCards() {
       });
       renderCards();
     }
+
+    // Fecha o modal ao clicar fora da caixa principal
+    document.getElementById("modalConfirmacao").addEventListener("click", function(event) {
+      if (event.target === this) {
+        fecharModal();
+      }
+    });
 
     carregarDadosPlanilha();
   </script>
