@@ -738,7 +738,7 @@
 
   <script>
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTcArOJ3RHAqX_nxVaI13pN-CUr6Y9cNVKJdrTHhpbD0D6qoYKZz28DOANhwOeV_QmGEajsLJTcLD9c/pub?gid=1718907358&single=true&output=csv";
-    const SEU_WHATSAPP = "75988660943";
+    const SEU_WHATSAPP = "5575988660943";
     const CHAVE_PIX = "matheusgomes2225@hotmail.com";
 
     function checarSeItemPreto(nome) {
@@ -968,10 +968,8 @@
         const correspondeBusca = item.nome.toLowerCase().includes(termoBusca) || 
                                  item.cat.toLowerCase().includes(termoBusca);
                                  
-        // O site enxerga a etiqueta "ehLivre" e verifica se ainda não atingiu a meta
         const naoEstaCompleto = item.ehLivre || item.adquirido < item.meta;
 
-        // Só retorna os itens que passam na categoria, na busca E que não estão completos
         return correspondeCategoria && correspondeBusca && naoEstaCompleto;
       });
 
@@ -985,21 +983,29 @@
         const qtdSelecionada = carrinho[item.id] || 0;
 
         let statusClass = "status-missing";
-        let statusText = item.ehLivre ? "Quantidade Livre" : `Precisamos de mais ${item.faltam}`;
+        let statusText = "";
         let progressColor = item.ehLivre ? "var(--accent)" : "var(--danger)";
         let pct = item.ehLivre ? 100 : Math.min(100, Math.round((item.adquirido / item.meta) * 100));
+
+        // Lógica de textos por quantidade e doações
+        if (item.ehLivre) {
+          statusText = "Quantidade Livre";
+          progressColor = "var(--accent)";
+        } else if (item.meta === 1 && item.adquirido === 0) {
+          statusText = ""; // Sem frase para itens de 1 unidade sem doações
+        } else if (item.adquirido === 0) {
+          statusText = `Precisamos de ${item.meta} unidades`;
+          progressColor = "var(--danger)";
+        } else {
+          statusText = `Precisamos de mais ${item.faltam} unidades`;
+          progressColor = "var(--pending)";
+          statusClass = "status-partial";
+        }
 
         if (completo) {
           statusClass = "status-done";
           statusText = "✔️";
           progressColor = "var(--success)";
-        } else if (!item.ehLivre && item.adquirido > 0) {
-          statusClass = "status-partial";
-          statusText = `Precisamos de mais ${item.faltam}`;
-          progressColor = "var(--pending)";
-        } else if (item.ehLivre) {
-          statusClass = "status-partial";
-          progressColor = "var(--accent)";
         }
 
         const card = document.createElement("div");
