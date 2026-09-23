@@ -984,20 +984,26 @@
 
         let statusClass = "status-missing";
         let statusText = "";
-        let progressColor = item.ehLivre ? "var(--accent)" : "var(--danger)";
+        let progressColor = item.ehLivre ? "var(--success)" : "var(--danger)";
         let pct = item.ehLivre ? 100 : Math.min(100, Math.round((item.adquirido / item.meta) * 100));
 
-        // Lógica de textos por quantidade e doações
+        // Lógica de textos por quantidade e doações (com tratamento de singular/plural e cores)
         if (item.ehLivre) {
           statusText = "Quantidade Livre";
-          progressColor = "var(--accent)";
+          progressColor = "var(--success)";
+          statusClass = "status-done";
         } else if (item.meta === 1 && item.adquirido === 0) {
           statusText = ""; // Sem frase para itens de 1 unidade sem doações
         } else if (item.adquirido === 0) {
           statusText = `Precisamos de ${item.meta} unidades`;
           progressColor = "var(--danger)";
         } else {
-          statusText = `Precisamos de mais ${item.faltam} unidades`;
+          // Trata singular ("1 unidade") e plural ("X unidades")
+          if (item.faltam === 1) {
+            statusText = `Precisamos de mais 1 unidade`;
+          } else {
+            statusText = `Precisamos de mais ${item.faltam} unidades`;
+          }
           progressColor = "var(--pending)";
           statusClass = "status-partial";
         }
